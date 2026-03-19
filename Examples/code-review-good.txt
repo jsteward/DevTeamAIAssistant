@@ -1,0 +1,68 @@
+// Good Example: Well-architected code
+using System.Data.SqlClient;
+
+public interface IUserRepository
+{
+    Task<User> GetByIdAsync(int userId);
+    Task<bool> DeleteAsync(int userId);
+}
+
+public class UserRepository : IUserRepository
+{
+    private readonly string _connectionString;
+    
+    public UserRepository(IConfiguration configuration)
+    {
+        _connectionString = configuration.GetConnectionString("DefaultConnection");
+    }
+    
+    public async Task<User> GetByIdAsync(int userId)
+    {
+        await using var connection = new SqlConnection(_connectionString);
+        await connection.OpenAsync();
+        
+        // Parameterized query prevents SQL injection
+        var command = new SqlCommand(
+            "SELECT Id, Name, Email FROM Users WHERE Id = @UserId", 
+            connection
+        );
+        command.Parameters.AddWithValue("@UserId", userId);
+        
+        await using var reader = await command.ExecuteReaderAsync();
+        
+        if (await reader.ReadAsync())
+        {
+            return new User
+            {
+                Id = (int)reader["Id"],
+                Name = reader["Name"].ToString(),
+                Email = reader["Email"].ToString()
+                // Note: Password NOT returned for security
+            };
+        }
+        
+        return null;
+    }
+    
+    public async Task<bool> DeleteAsync(int userId)
+    {
+        await using var connection = new SqlConnection(_connectionString);
+        await connection.OpenAsync();
+        
+        var command = new SqlCommand(
+            "DELETE FROM Users WHERE Id = @UserId", 
+            connection
+        );
+        command.Parameters.AddWithValue("@UserId", userId);
+        
+        var rowsAffected = await command.ExecuteNonQueryAsync();
+        return rowsAffected > 0;
+    }
+}
+
+public class User
+{
+    public int Id { get; set; }
+    public string Name { get; set; }
+    public string Email { get; set; }
+}

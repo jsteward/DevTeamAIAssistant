@@ -1,0 +1,52 @@
+// SOLID Violations Example
+
+public class ReportGenerator
+{
+    // Single Responsibility Violation: Does data access, business logic, AND formatting
+    public string GenerateCustomerReport(int customerId)
+    {
+        // Data Access
+        var connectionString = "Server=localhost;Database=CRM;";
+        using (var connection = new SqlConnection(connectionString))
+        {
+            connection.Open();
+            var command = new SqlCommand($"SELECT * FROM Customers WHERE Id = {customerId}", connection);
+            var reader = command.ExecuteReader();
+            
+            if (!reader.Read())
+                return "Customer not found";
+            
+            var name = reader["Name"].ToString();
+            var email = reader["Email"].ToString();
+            var balance = (decimal)reader["Balance"];
+            
+            // Business Logic
+            var status = balance > 1000 ? "Premium" : "Standard";
+            var discount = balance > 1000 ? 0.1m : 0.0m;
+            
+            // Formatting (HTML generation)
+            var html = "<html><body>";
+            html += $"<h1>Customer Report</h1>";
+            html += $"<p>Name: {name}</p>";
+            html += $"<p>Email: {email}</p>";
+            html += $"<p>Status: {status}</p>";
+            html += $"<p>Discount: {discount * 100}%</p>";
+            html += "</body></html>";
+            
+            return html;
+        }
+    }
+    
+    // Open/Closed Violation: Can't extend without modifying
+    public decimal CalculateDiscount(string customerType, decimal amount)
+    {
+        if (customerType == "Premium")
+            return amount * 0.1m;
+        else if (customerType == "Gold")
+            return amount * 0.15m;
+        else if (customerType == "Platinum")
+            return amount * 0.2m;
+        else
+            return 0;
+    }
+}

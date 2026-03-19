@@ -1,0 +1,26 @@
+using System.Net.Http;
+
+public class ApiClient
+{
+    private readonly HttpClient _httpClient = new HttpClient();
+    
+    // ISSUE: Blocking async call with .Result
+    // ISSUE: HttpClient created per instance (should be singleton)
+    public string GetData(string url)
+    {
+        var response = _httpClient.GetAsync(url).Result;
+        response.EnsureSuccessStatusCode();
+        
+        return response.Content.ReadAsStringAsync().Result;
+    }
+    
+    // ISSUE: Not disposing HttpResponseMessage
+    // ISSUE: No error handling
+    public void PostData(string url, string data)
+    {
+        var content = new StringContent(data);
+        var response = _httpClient.PostAsync(url, content).Result;
+        
+        // Memory leak - response never disposed
+    }
+}

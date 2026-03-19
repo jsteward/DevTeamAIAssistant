@@ -1,0 +1,42 @@
+using System.Data.SqlClient;
+
+public class OrderRepository
+{
+    private readonly string _connectionString = "Server=localhost;Database=Orders;";
+    
+    public List<Order> SearchOrders(string customerName)
+    {
+        var orders = new List<Order>();
+        
+        using (var connection = new SqlConnection(_connectionString))
+        {
+            connection.Open();
+            
+            // SQL Injection vulnerability - user input not parameterized
+            var query = $"SELECT * FROM Orders WHERE CustomerName LIKE '%{customerName}%'";
+            var command = new SqlCommand(query, connection);
+            
+            using (var reader = command.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    orders.Add(new Order
+                    {
+                        Id = (int)reader["Id"],
+                        CustomerName = reader["CustomerName"].ToString(),
+                        Total = (decimal)reader["Total"]
+                    });
+                }
+            }
+        }
+        
+        return orders;
+    }
+}
+
+public class Order
+{
+    public int Id { get; set; }
+    public string CustomerName { get; set; }
+    public decimal Total { get; set; }
+}

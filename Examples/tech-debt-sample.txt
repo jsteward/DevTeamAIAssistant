@@ -1,0 +1,53 @@
+Legacy authentication system using MD5 hashing
+Monolithic API needs to be split into microservices
+No monitoring or logging in production
+Database queries not optimized - full table scans
+Frontend using outdated jQuery - should migrate to React
+No automated backups configured
+API documentation is 2 years out of date
+Test coverage is only 30%
+Hard-coded configuration values throughout codebase
+No disaster recovery plan
+```
+
+---
+
+## **STEP 4: Create .gitignore (2 min)**
+
+**File: `.gitignore`**
+```
+## .NET
+
+bin/
+obj/
+*.user
+*.suo
+*.cache
+*.log
+
+## Build results
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+
+## Visual Studio
+.vs/
+*.csproj.user
+
+## Configuration (contains API keys)
+appsettings.json
+appsettings.*.json
+!appsettings.example.json
+
+## User-specific files
+*.rsuser
+*.userprefs
+
+## macOS
+.DS_Store
