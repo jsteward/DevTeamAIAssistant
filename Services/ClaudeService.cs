@@ -14,8 +14,15 @@ public partial class ClaudeService : IClaudeService
 
     public ClaudeService(IConfiguration configuration)
     {
-        _apiKey = configuration["Anthropic:ApiKey"] 
-            ?? throw new InvalidOperationException("Anthropic API key not configured");
+        var key = configuration["Anthropic:ApiKey"];
+        if (string.IsNullOrWhiteSpace(key))
+        {
+            
+            throw new InvalidOperationException("Anthropic API key not configured");
+        } else
+        {
+            _apiKey = key;
+        }         
         _model = configuration["Anthropic:Model"] ?? "claude-sonnet-4-20250514";
         
         _httpClient = new HttpClient();
