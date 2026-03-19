@@ -19,7 +19,33 @@ DevTeam AI Assistant helps development managers make data-driven decisions by le
 **Purpose:** Demonstrates practical LLM integration in enterprise .NET applications
 
 ---
+## 🧪 Testing
 
+This project includes comprehensive unit tests using NUnit, Moq, and FluentAssertions.
+
+### Running Tests
+```bash
+# Run all tests
+dotnet test
+
+# Run with detailed output
+dotnet test --verbosity normal
+
+# Run with code coverage
+dotnet test /p:CollectCoverage=true
+```
+
+### Test Framework
+
+- **NUnit 3.14**: Modern .NET testing framework
+- **Moq 4.20**: Mocking library for dependency injection
+- **FluentAssertions**: Readable assertion library
+
+### Test Coverage
+
+- Services: Configuration and initialization
+- Features: All analyzer classes
+- Models: Data structure validation
 ## ✨ Features
 
 ### 🔍 1. Sprint Retrospective Analyzer
