@@ -2,11 +2,10 @@ using Microsoft.Extensions.Configuration;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace DevTeamAIAssistant.Services;
 
-public class ClaudeService : IClaudeService
+public partial class ClaudeService : IClaudeService
 {
     private readonly HttpClient _httpClient;
     private readonly string _apiKey;
@@ -114,51 +113,5 @@ Context:
             Console.WriteLine($"Error: {ex.Message}\n");
             throw new InvalidOperationException("Claude returned invalid JSON format", ex);
         }
-    }
-
-    // Response models for API deserialization
-    private class ClaudeApiResponse
-    {
-        [JsonPropertyName("id")]
-        public string? Id { get; set; }
-
-        [JsonPropertyName("type")]
-        public string? Type { get; set; }
-
-        [JsonPropertyName("role")]
-        public string? Role { get; set; }
-
-        [JsonPropertyName("content")]
-        public List<ContentBlock>? Content { get; set; }
-
-        [JsonPropertyName("model")]
-        public string? Model { get; set; }
-
-        [JsonPropertyName("stop_reason")]
-        public string? StopReason { get; set; }
-
-        [JsonPropertyName("stop_sequence")]
-        public string? StopSequence { get; set; }
-
-        [JsonPropertyName("usage")]
-        public Usage? Usage { get; set; }
-    }
-
-    private class ContentBlock
-    {
-        [JsonPropertyName("type")]
-        public string? Type { get; set; }
-
-        [JsonPropertyName("text")]
-        public string? Text { get; set; }
-    }
-
-    private class Usage
-    {
-        [JsonPropertyName("input_tokens")]
-        public int InputTokens { get; set; }
-
-        [JsonPropertyName("output_tokens")]
-        public int OutputTokens { get; set; }
     }
 }
