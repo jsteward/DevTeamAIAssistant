@@ -26,4 +26,8 @@
     <Folder Include="Models/" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Remove="DevTeamAIAssistant.test/**" />
+  </ItemGroup>
+
 </Project>
