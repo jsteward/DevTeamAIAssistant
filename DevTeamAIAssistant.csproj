@@ -10,10 +10,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="DevTeamAIAssistant.test/**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Anthropic.SDK" Version="5.10.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="10.0.5" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="10.0.5" />
@@ -25,6 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Art/" />
     <Folder Include="Features/" />
     <Folder Include="Models/" />
   </ItemGroup>
