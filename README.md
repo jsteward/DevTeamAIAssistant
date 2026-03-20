@@ -1,5 +1,5 @@
-# <img src="https://raw.githubusercontent.com/jsteward/DevTeamAIAssistant/main/IdeaRoostIcon.jpg" width="32" height="32" alt="DevTeam AI"> DevTeam AI Assistant
-# 🤖 DevTeam AI Assistant
+
+# DevTeam AI Assistant
 
 > An AI-powered toolkit for software development managers built with .NET 8 and Claude AI
 
