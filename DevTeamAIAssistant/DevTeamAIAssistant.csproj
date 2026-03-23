@@ -22,12 +22,9 @@
 
   <ItemGroup>
     <Folder Include="Art/" />
-    <Folder Include="Features/" />
     <Folder Include="Models/" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Remove="DevTeamAIAssistant.test/**" />
+    <Folder Include="Requests/" />
+    <Folder Include="Response/" />
   </ItemGroup>
 
 </Project>

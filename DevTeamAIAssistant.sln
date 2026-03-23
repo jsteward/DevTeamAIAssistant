@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.2.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DevTeamAIAssistant", "DevTeamAIAssistant.csproj", "{9CA0C510-410A-DC6A-3550-DE088F1EF19A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DevTeamAIAssistant", "DevTeamAIAssistant\DevTeamAIAssistant.csproj", "{9CA0C510-410A-DC6A-3550-DE088F1EF19A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DevTeamAIAssistant.test", "DevTeamAIAssistant.test\DevTeamAIAssistant.test.csproj", "{46503D80-25EF-4203-8C1C-31C095CECBBA}"
 EndProject

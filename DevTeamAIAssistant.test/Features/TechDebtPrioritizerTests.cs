@@ -11,13 +11,13 @@ namespace DevTeamAIAssistant.Tests.Features;
 public class TechDebtPrioritizerTests
 {
     private Mock<IClaudeService> _mockClaudeService;
-    private TechDebtPrioritizer _prioritizer;
+    private TechDebtPriorityAnalyzer _prioritizer;
 
     [SetUp]
     public void SetUp()
     {
         _mockClaudeService = new Mock<IClaudeService>();
-        _prioritizer = new TechDebtPrioritizer(_mockClaudeService.Object);
+        _prioritizer = new TechDebtPriorityAnalyzer(_mockClaudeService.Object);
     }
 
     [Test]

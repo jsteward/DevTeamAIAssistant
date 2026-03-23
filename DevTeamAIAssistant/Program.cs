@@ -1,4 +1,5 @@
 ﻿using DevTeamAIAssistant.Features;
+using DevTeamAIAssistant.Requests;
 using DevTeamAIAssistant.Services;
 using Microsoft.Extensions.Configuration;
 
@@ -17,8 +18,8 @@ class Program
         // Initialize services
         var claudeService = new ClaudeService(configuration);
         var retroAnalyzer = new RetrospectiveAnalyzer(claudeService);
-        var codeReviewer = new CodeReviewer(claudeService);
-        var techDebtPrioritizer = new TechDebtPrioritizer(claudeService);  // ADD THIS LINE
+        var codeReviewer = new CodeReviewAnalyzer(claudeService);
+        var techDebtPrioritizer = new TechDebtPriorityAnalyzer(claudeService);  // ADD THIS LINE
 
         Console.WriteLine("╔════════════════════════════════════════════════════════╗");
         Console.WriteLine("║        DevTeam AI Assistant v1.0                       ║");
@@ -84,26 +85,33 @@ class Program
         }
     }
 
-    static async Task RunCodeReview(CodeReviewer reviewer)
+    static async Task RunCodeReview(CodeReviewAnalyzer reviewer)
     {
         Console.WriteLine("\n--- Code Review Assistant ---");
         Console.WriteLine("Enter code to review (type 'END' on a new line when done):\n");
 
         var codeLines = new List<string>();
         string? line;
-        while ((line = Console.ReadLine()) != "END")
-        {
+        while ((line= Console.ReadLine()) != "END")
+        {            
             if (line != null) codeLines.Add(line);
         }
 
-        var code = string.Join("\n", codeLines);
+var request = new CodeReviewAnalyzerRequest
+        { 
+            Data = string.Join("\n", codeLines),
+            Context = "This code is part of a web API project using ASP.NET Core."
+        };
+        //var code = string.Join("\n", codeLines);
         
         Console.WriteLine("\n🤖 Reviewing code...\n");
         
         try
         {
-            var review = await reviewer.ReviewCodeAsync(code);
-            reviewer.DisplayReview(review);
+            var result = await reviewer.AnalyzeAsync(request);
+            //var review = await reviewer.ReviewCodeAsync(code);
+            result.Display();
+            //reviewer.DisplayReview(result);
         }
         catch (Exception ex)
         {
@@ -112,7 +120,7 @@ class Program
     }
 
     // ADD THIS ENTIRE METHOD
-    static async Task RunTechDebtPrioritization(TechDebtPrioritizer prioritizer)
+    static async Task RunTechDebtPrioritization(TechDebtPriorityAnalyzer prioritizer)
     {
         Console.WriteLine("\n--- Technical Debt Prioritizer ---");
         Console.WriteLine("Enter technical debt items (one per line, type 'END' when done):\n");

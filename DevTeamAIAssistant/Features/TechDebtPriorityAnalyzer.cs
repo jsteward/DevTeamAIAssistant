@@ -3,11 +3,11 @@ using DevTeamAIAssistant.Services;
 
 namespace DevTeamAIAssistant.Features;
 
-public class TechDebtPrioritizer
+public class TechDebtPriorityAnalyzer
 {
     private readonly IClaudeService _claudeService;
 
-    public TechDebtPrioritizer(IClaudeService claudeService)
+    public TechDebtPriorityAnalyzer(IClaudeService claudeService)
     {
         _claudeService = claudeService;
     }

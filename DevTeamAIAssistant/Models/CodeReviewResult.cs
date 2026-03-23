@@ -1,3 +1,5 @@
+using DevTeamAIAssistant.Response;
+
 namespace DevTeamAIAssistant.Models;
 
 public class CodeReviewResult

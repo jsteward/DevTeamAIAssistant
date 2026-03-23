@@ -1,0 +1,15 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "DevTeamAIAssistant"
+		}
+	],
+	"settings": {
+		"chat.tools.terminal.autoApprove": {
+			"dotnet build": true
+		}
+	}
+}

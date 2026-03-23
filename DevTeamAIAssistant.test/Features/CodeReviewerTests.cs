@@ -4,6 +4,8 @@ using FluentAssertions;
 using DevTeamAIAssistant.Features;
 using DevTeamAIAssistant.Models;
 using DevTeamAIAssistant.Services;
+using DevTeamAIAssistant.Requests;
+using DevTeamAIAssistant.Response;
 
 namespace DevTeamAIAssistant.Tests.Features;
 
@@ -11,13 +13,13 @@ namespace DevTeamAIAssistant.Tests.Features;
 public class CodeReviewerTests
 {
     private Mock<IClaudeService> _mockClaudeService;
-    private CodeReviewer _reviewer;
+    private CodeReviewAnalyzer _reviewer;
 
     [SetUp]
     public void SetUp()
     {
         _mockClaudeService = new Mock<IClaudeService>();
-        _reviewer = new CodeReviewer(_mockClaudeService.Object);
+        _reviewer = new CodeReviewAnalyzer(_mockClaudeService.Object);
     }
 
     [Test]
@@ -25,6 +27,10 @@ public class CodeReviewerTests
     {
         // Arrange
         var code = "public class Test { }";
+        var request = new CodeReviewAnalyzerRequest
+        { 
+            Data = code
+        };
         var expectedResult = new CodeReviewResult
         {
             OverallAssessment = "Code looks good",
@@ -51,13 +57,14 @@ public class CodeReviewerTests
             .ReturnsAsync(expectedResult);
 
         // Act
-        var result = await _reviewer.ReviewCodeAsync(code);
+        var response = await _reviewer.AnalyzeAsync(request);
 
+        var result = response as CodeReviewAnalyzerResponse;
         // Assert
         result.Should().NotBeNull();
-        result.QualityScore.Should().Be(8);
-        result.Comments.Should().HaveCount(1);
-        result.BestPractices.Should().Contain("Good class structure");
+        result.Review.QualityScore.Should().Be(8);
+        result.Review.Comments.Should().HaveCount(1);
+        result.Review.BestPractices.Should().Contain("Good class structure");
     }
 
     [Test]
@@ -68,6 +75,11 @@ public class CodeReviewerTests
         var context = "This is a test class for unit testing";
         string? capturedPrompt = null;
 
+        var request = new CodeReviewAnalyzerRequest
+        { 
+            Data = code,
+            Context = context
+        };
         _mockClaudeService
             .Setup(x => x.AnalyzeStructuredAsync<CodeReviewResult>(
                 It.IsAny<string>(), 
@@ -79,7 +91,7 @@ public class CodeReviewerTests
             .ReturnsAsync(new CodeReviewResult());
 
         // Act
-        await _reviewer.ReviewCodeAsync(code, context);
+        await _reviewer.AnalyzeAsync(request);
 
         // Assert
         capturedPrompt.Should().Contain(context);
@@ -95,6 +107,10 @@ public class CodeReviewerTests
     {
         // Arrange
         var code = "test code";
+        var request = new CodeReviewAnalyzerRequest
+        { 
+            Data = code
+        };
         string? capturedPrompt = null;
 
         _mockClaudeService
@@ -108,7 +124,7 @@ public class CodeReviewerTests
             .ReturnsAsync(new CodeReviewResult());
 
         // Act
-        await _reviewer.ReviewCodeAsync(code);
+        await _reviewer.AnalyzeAsync(request);
 
         // Assert
         capturedPrompt.Should().Contain("senior software architect");
