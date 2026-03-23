@@ -73,11 +73,16 @@ class Program
         var retrospectiveText = string.Join("\n", notes);
         
         Console.WriteLine("\n🤖 Analyzing retrospective...\n");
-        
+        var request = new RetrospectiveAnalyzerRequest
+        {
+            Data = retrospectiveText,
+            Context = "This retrospective is for a 2-week sprint in a mid-sized software development team."
+        };
         try
         {
-            var report = await analyzer.AnalyzeRetrospectiveAsync(retrospectiveText);
-            analyzer.DisplayReport(report);
+            var response = await analyzer.AnalyzeAsync(request);
+            response.Display();
+            //analyzer.DisplayReport(response.Report);
         }
         catch (Exception ex)
         {

@@ -4,6 +4,8 @@ using FluentAssertions;
 using DevTeamAIAssistant.Features;
 using DevTeamAIAssistant.Models;
 using DevTeamAIAssistant.Services;
+using DevTeamAIAssistant.Requests;
+using DevTeamAIAssistant.Response;
 
 namespace DevTeamAIAssistant.Tests.Features;
 
@@ -51,14 +53,15 @@ public class RetrospectiveAnalyzerTests
             .ReturnsAsync(expectedReport);
 
         // Act
-        var result = await _analyzer.AnalyzeRetrospectiveAsync(retrospectiveNotes);
+        var response = await _analyzer.AnalyzeAsync(new RetrospectiveAnalyzerRequest  { Data = retrospectiveNotes });
+        var result = response as RetrospectiveAnalyzerResponse;
 
         // Assert
         result.Should().NotBeNull();
-        result.OverallSentiment.Should().Be("Positive");
-        result.KeyThemes.Should().Contain("Velocity improvement");
-        result.ActionItems.Should().HaveCount(1);
-        result.Wins.Should().Contain("Velocity increased");
+        result.Report.OverallSentiment.Should().Be("Positive");
+        result.Report.KeyThemes.Should().Contain("Velocity improvement");
+        result.Report.ActionItems.Should().HaveCount(1);
+        result.Report.Wins.Should().Contain("Velocity increased");
     }
 
     [Test]
@@ -68,7 +71,11 @@ public class RetrospectiveAnalyzerTests
         var retrospectiveNotes = "Test notes";
         string? capturedPrompt = null;
         string? capturedContext = null;
-
+        var request = new RetrospectiveAnalyzerRequest
+                {
+                    Data = retrospectiveNotes,
+                    Context = "This retrospective is for a 2-week sprint in a mid-sized software development team."
+                };
         _mockClaudeService
             .Setup(x => x.AnalyzeStructuredAsync<RetrospectiveReport>(
                 It.IsAny<string>(), 
@@ -81,7 +88,7 @@ public class RetrospectiveAnalyzerTests
             .ReturnsAsync(new RetrospectiveReport());
 
         // Act
-        await _analyzer.AnalyzeRetrospectiveAsync(retrospectiveNotes);
+        await _analyzer.AnalyzeAsync(request);
 
         // Assert
         _mockClaudeService.Verify(
@@ -98,6 +105,11 @@ public class RetrospectiveAnalyzerTests
     public async Task AnalyzeRetrospectiveAsync_WithEmptyInput_StillCallsService(string input)
     {
         // Arrange
+        var request = new RetrospectiveAnalyzerRequest
+        {
+            Data = input,
+            Context = "This retrospective is for a 2-week sprint in a mid-sized software development team."
+        };
         _mockClaudeService
             .Setup(x => x.AnalyzeStructuredAsync<RetrospectiveReport>(
                 It.IsAny<string>(), 
@@ -105,7 +117,7 @@ public class RetrospectiveAnalyzerTests
             .ReturnsAsync(new RetrospectiveReport());
 
         // Act
-        var result = await _analyzer.AnalyzeRetrospectiveAsync(input);
+        var result = await _analyzer.AnalyzeAsync(request);
 
         // Assert
         result.Should().NotBeNull();
