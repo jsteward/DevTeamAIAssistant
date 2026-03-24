@@ -19,6 +19,12 @@ class Program
 
         var services = new ServiceCollection();
         services.AddSingleton<IConfiguration>(configuration);
+        services.AddHttpClient("Anthropic", client =>
+        {
+            client.DefaultRequestHeaders.Add("anthropic-version", "2023-06-01");
+            client.DefaultRequestHeaders.Accept.Add(
+                new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+        });
         services.AddSingleton<IClaudeService, ClaudeService>();
         services.AddTransient<IAnalyzer<RetrospectiveAnalyzerRequest, RetrospectiveAnalyzerResponse>, RetrospectiveAnalyzer>();
         services.AddTransient<IAnalyzer<CodeReviewAnalyzerRequest, CodeReviewAnalyzerResponse>, CodeReviewAnalyzer>();

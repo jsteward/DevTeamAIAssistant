@@ -23,16 +23,9 @@ public class CodeReviewRunner : IAnalyzerRunner
         Console.WriteLine("\n--- Code Review Assistant ---");
         Console.WriteLine("Enter code to review (type 'END' on a new line when done):\n");
 
-        var codeLines = new List<string>();
-        string? line;
-        while (!string.Equals(line = Console.ReadLine(), "END", StringComparison.OrdinalIgnoreCase))
-        {
-            if (line != null) codeLines.Add(line);
-        }
-
         var request = new CodeReviewAnalyzerRequest
         {
-            Data = string.Join("\n", codeLines),
+            Data = string.Join("\n", ConsoleInput.ReadLines()),
             Context = "This code is part of a web API project using ASP.NET Core."
         };
 

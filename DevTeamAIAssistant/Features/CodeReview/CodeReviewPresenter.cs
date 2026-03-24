@@ -1,3 +1,4 @@
+using DevTeamAIAssistant.Models;
 using DevTeamAIAssistant.Response;
 
 namespace DevTeamAIAssistant.Features.Presenters;
@@ -30,7 +31,7 @@ public class CodeReviewPresenter : IAnalyzerPresenter<CodeReviewAnalyzerResponse
         }
 
         Console.WriteLine("\nReview Comments:");
-        foreach (var group in review.Comments.GroupBy(c => c.Severity).OrderBy(g => GetSeverityOrder(g.Key)))
+        foreach (var group in review.Comments.GroupBy(c => c.Severity).OrderBy(g => SeverityLevelExtensions.Parse(g.Key)))
         {
             Console.WriteLine($"\n  [{group.Key.ToUpper()}]");
             foreach (var comment in group)
@@ -45,13 +46,4 @@ public class CodeReviewPresenter : IAnalyzerPresenter<CodeReviewAnalyzerResponse
 
         Console.WriteLine(new string('=', 60) + "\n");
     }
-
-    private static int GetSeverityOrder(string severity) => severity.ToLower() switch
-    {
-        "critical" => 1,
-        "high" => 2,
-        "medium" => 3,
-        "low" => 4,
-        _ => 5
-    };
 }

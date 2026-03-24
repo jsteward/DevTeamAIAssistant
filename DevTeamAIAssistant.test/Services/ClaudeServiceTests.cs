@@ -10,11 +10,14 @@ namespace DevTeamAIAssistant.Tests.Services;
 public class ClaudeServiceTests
 {
     private Mock<IConfiguration> _mockConfiguration;
+    private Mock<IHttpClientFactory> _mockHttpClientFactory;
 
     [SetUp]
     public void SetUp()
     {
         _mockConfiguration = new Mock<IConfiguration>();
+        _mockHttpClientFactory = new Mock<IHttpClientFactory>();
+        _mockHttpClientFactory.Setup(f => f.CreateClient("Anthropic")).Returns(new HttpClient());
     }
 
     [Test]
@@ -24,9 +27,9 @@ public class ClaudeServiceTests
         _mockConfiguration.Setup(c => c["Anthropic:ApiKey"]).Returns((string?)null);
 
         // Act & Assert
-        var exception = Assert.Throws<InvalidOperationException>(() => 
-            new ClaudeService(_mockConfiguration.Object));
-        
+        var exception = Assert.Throws<InvalidOperationException>(() =>
+            new ClaudeService(_mockConfiguration.Object, _mockHttpClientFactory.Object));
+
         exception?.Message.Should().Contain("API key not configured");
     }
 
@@ -38,7 +41,7 @@ public class ClaudeServiceTests
         _mockConfiguration.Setup(c => c["Anthropic:Model"]).Returns("claude-sonnet-4-20250514");
 
         // Act
-        var service = new ClaudeService(_mockConfiguration.Object);
+        var service = new ClaudeService(_mockConfiguration.Object, _mockHttpClientFactory.Object);
 
         // Assert
         service.Should().NotBeNull();
@@ -52,7 +55,7 @@ public class ClaudeServiceTests
         _mockConfiguration.Setup(c => c["Anthropic:Model"]).Returns((string?)null);
 
         // Act
-        var service = new ClaudeService(_mockConfiguration.Object);
+        var service = new ClaudeService(_mockConfiguration.Object, _mockHttpClientFactory.Object);
 
         // Assert
         service.Should().NotBeNull();
@@ -66,7 +69,7 @@ public class ClaudeServiceTests
         _mockConfiguration.Setup(c => c["Anthropic:ApiKey"]).Returns(emptyKey);
 
         // Act & Assert
-        Assert.Throws<InvalidOperationException>(() => 
-            new ClaudeService(_mockConfiguration.Object));
+        Assert.Throws<InvalidOperationException>(() =>
+            new ClaudeService(_mockConfiguration.Object, _mockHttpClientFactory.Object));
     }
 }

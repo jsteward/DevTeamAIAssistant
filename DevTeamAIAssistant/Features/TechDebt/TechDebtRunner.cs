@@ -23,13 +23,7 @@ public class TechDebtRunner : IAnalyzerRunner
         Console.WriteLine("\n--- Technical Debt Prioritizer ---");
         Console.WriteLine("Enter technical debt items (one per line, type 'END' when done):\n");
 
-        var items = new List<string>();
-        string? line;
-        while (!string.Equals(line = Console.ReadLine(), "END", StringComparison.OrdinalIgnoreCase))
-        {
-            if (!string.IsNullOrWhiteSpace(line))
-                items.Add(line);
-        }
+        var items = ConsoleInput.ReadLines(skipEmpty: true);
 
         if (!items.Any())
         {

@@ -1,5 +1,4 @@
 using Microsoft.Extensions.Configuration;
-using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 
@@ -12,24 +11,18 @@ public partial class ClaudeService : IClaudeService
     private readonly string _model;
     private const string AnthropicApiUrl = "https://api.anthropic.com/v1/messages";
 
-    public ClaudeService(IConfiguration configuration)
+    public ClaudeService(IConfiguration configuration, IHttpClientFactory httpClientFactory)
     {
         var key = configuration["Anthropic:ApiKey"];
         if (string.IsNullOrWhiteSpace(key))
         {
-            
             throw new InvalidOperationException("Anthropic API key not configured");
-        } else
-        {
-            _apiKey = key;
-        }         
+        }
+        _apiKey = key;
         _model = configuration["Anthropic:Model"] ?? "claude-sonnet-4-20250514";
-        
-        _httpClient = new HttpClient();
+
+        _httpClient = httpClientFactory.CreateClient("Anthropic");
         _httpClient.DefaultRequestHeaders.Add("x-api-key", _apiKey);
-        _httpClient.DefaultRequestHeaders.Add("anthropic-version", "2023-06-01");
-        _httpClient.DefaultRequestHeaders.Accept.Add(
-            new MediaTypeWithQualityHeaderValue("application/json"));
     }
 
     public async Task<string> AnalyzeAsync(string prompt, string context)

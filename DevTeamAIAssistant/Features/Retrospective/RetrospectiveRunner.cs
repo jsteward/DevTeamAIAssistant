@@ -23,16 +23,9 @@ public class RetrospectiveRunner : IAnalyzerRunner
         Console.WriteLine("\n--- Sprint Retrospective Analyzer ---");
         Console.WriteLine("Enter retrospective notes (type 'END' on a new line when done):\n");
 
-        var notes = new List<string>();
-        string? line;
-        while (!string.Equals(line = Console.ReadLine(), "END", StringComparison.OrdinalIgnoreCase))
-        {
-            if (line != null) notes.Add(line);
-        }
-
         var request = new RetrospectiveAnalyzerRequest
         {
-            Data = string.Join("\n", notes),
+            Data = string.Join("\n", ConsoleInput.ReadLines()),
             Context = "This retrospective is for a 2-week sprint in a mid-sized software development team."
         };
 

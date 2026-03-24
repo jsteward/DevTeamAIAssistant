@@ -69,68 +69,6 @@ public partial class CodeReviewAnalyzer : IAnalyzer<CodeReviewAnalyzerRequest, C
         }
     }
 
-    public void DisplayReview(CodeReviewResult review)
-    {
-        if(review == null)
-        {
-            Console.WriteLine("No review data to display.");
-            return;
-        }
-        Console.WriteLine("\n" + new string('=', 60));
-        Console.WriteLine("CODE REVIEW ANALYSIS");
-        Console.WriteLine(new string('=', 60));
-        
-        Console.WriteLine($"\n📊 Quality Score: {review.QualityScore}/10");
-        Console.WriteLine($"\n📝 Overall Assessment:\n  {review.OverallAssessment}");
-        
-        if (review.SecurityConcerns.Any())
-        {
-            Console.WriteLine("\n🔒 Security Concerns:");
-            foreach (var concern in review.SecurityConcerns)
-            {
-                Console.WriteLine($"  ⚠️  {concern}");
-            }
-        }
-        
-        if (review.BestPractices.Any())
-        {
-            Console.WriteLine("\n✅ Best Practices Observed:");
-            foreach (var practice in review.BestPractices)
-            {
-                Console.WriteLine($"  • {practice}");
-            }
-        }
-        
-        Console.WriteLine("\n💬 Review Comments:");
-        var groupedComments = review.Comments.GroupBy(c => c.Severity);
-        
-        foreach (var group in groupedComments.OrderBy(g => GetSeverityOrder(g.Key)))
-        {
-            Console.WriteLine($"\n  [{group.Key.ToUpper()}]");
-            foreach (var comment in group)
-            {
-                Console.WriteLine($"    {comment.Category}: {comment.Issue}");
-                Console.WriteLine($"    💡 {comment.Suggestion}");
-                if (comment.LineNumber > 0)
-                {
-                    Console.WriteLine($"    📍 Line {comment.LineNumber}");
-                }
-                Console.WriteLine();
-            }
-        }
-        
-        Console.WriteLine(new string('=', 60) + "\n");
-    }
-
-    private static int GetSeverityOrder(string severity) => severity.ToLower() switch
-    {
-        "critical" => 1,
-        "high" => 2,
-        "medium" => 3,
-        "low" => 4,
-        _ => 5
-    };
-
     private static string SanitizeInput(string input)
     {
         // Remove control characters
