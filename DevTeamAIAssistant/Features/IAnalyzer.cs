@@ -1,12 +1,11 @@
-using System;
 using DevTeamAIAssistant.Requests;
 using DevTeamAIAssistant.Response;
 
-namespace DevTeamAIAssistant.test.Features;
+namespace DevTeamAIAssistant.Features;
 
-public interface IAnalyzer
+public interface IAnalyzer<TRequest, TResponse>
+    where TRequest : IAnalyzerRequest
+    where TResponse : IAnalyzerResponse
 {
-    Task<IAnalyzerResponse> AnalyzeAsync(IAnalyzerRequest request); 
-
+    Task<TResponse> AnalyzeAsync(TRequest request);
 }
-

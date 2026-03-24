@@ -2,11 +2,9 @@ using DevTeamAIAssistant.Models;
 using DevTeamAIAssistant.Requests;
 using DevTeamAIAssistant.Response;
 using DevTeamAIAssistant.Services;
-using DevTeamAIAssistant.test.Features;
-
 namespace DevTeamAIAssistant.Features;
 
-public class RetrospectiveAnalyzer : IAnalyzer
+public class RetrospectiveAnalyzer : IAnalyzer<RetrospectiveAnalyzerRequest, RetrospectiveAnalyzerResponse>
 {
     private readonly IClaudeService _claudeService;
 
@@ -15,7 +13,7 @@ public class RetrospectiveAnalyzer : IAnalyzer
         _claudeService = claudeService;
     }
 
-    public async Task<IAnalyzerResponse> AnalyzeAsync(IAnalyzerRequest request)
+    public async Task<RetrospectiveAnalyzerResponse> AnalyzeAsync(RetrospectiveAnalyzerRequest request)
     {
         var response = new RetrospectiveAnalyzerResponse();
         var prompt = @"You are an expert Agile coach analyzing a sprint retrospective.

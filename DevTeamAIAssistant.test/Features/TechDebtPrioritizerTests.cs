@@ -4,6 +4,7 @@ using FluentAssertions;
 using DevTeamAIAssistant.Features;
 using DevTeamAIAssistant.Models;
 using DevTeamAIAssistant.Services;
+using DevTeamAIAssistant.Requests;
 
 namespace DevTeamAIAssistant.Tests.Features;
 
@@ -28,6 +29,10 @@ public class TechDebtPrioritizerTests
         {
             "Legacy auth system",
             "No automated backups"
+        };
+        var request = new TechDebtPriorityAnalyzerRequest
+        {
+            Data = string.Join("\n", debtItems.Select((item, i) => $"{i + 1}. {item}"))
         };
 
         var expectedAnalysis = new TechDebtAnalysis
@@ -58,13 +63,12 @@ public class TechDebtPrioritizerTests
             .ReturnsAsync(expectedAnalysis);
 
         // Act
-        var result = await _prioritizer.PrioritizeDebtAsync(debtItems);
-
+        var result = await _prioritizer.AnalyzeAsync(request);
         // Assert
         result.Should().NotBeNull();
-        result.TotalEstimatedDays.Should().Be(15);
-        result.PrioritizedItems.Should().HaveCount(1);
-        result.PrioritizedItems[0].Priority.Should().Be(10);
+        result.Report.TotalEstimatedDays.Should().Be(15);
+        result.Report.PrioritizedItems.Should().HaveCount(1);
+        result.Report.PrioritizedItems[0].Priority.Should().Be(10);
     }
 
     [Test]
@@ -77,7 +81,10 @@ public class TechDebtPrioritizerTests
             "Item 2",
             "Item 3"
         };
-
+        var request = new TechDebtPriorityAnalyzerRequest
+        {
+            Data = string.Join("\n", debtItems.Select((item, i) => $"{i + 1}. {item}"))
+        };
         string? capturedContext = null;
 
         _mockClaudeService
@@ -91,7 +98,7 @@ public class TechDebtPrioritizerTests
             .ReturnsAsync(new TechDebtAnalysis());
 
         // Act
-        await _prioritizer.PrioritizeDebtAsync(debtItems);
+        var result = await _prioritizer.AnalyzeAsync(request);
 
         // Assert
         capturedContext.Should().Contain("1. Item 1");
@@ -104,6 +111,10 @@ public class TechDebtPrioritizerTests
     {
         // Arrange
         var emptyList = new List<string>();
+        var request = new TechDebtPriorityAnalyzerRequest
+        {
+            Data = string.Empty
+        };
 
         _mockClaudeService
             .Setup(x => x.AnalyzeStructuredAsync<TechDebtAnalysis>(
@@ -112,7 +123,7 @@ public class TechDebtPrioritizerTests
             .ReturnsAsync(new TechDebtAnalysis());
 
         // Act
-        var result = await _prioritizer.PrioritizeDebtAsync(emptyList);
+        var result = await _prioritizer.AnalyzeAsync(request);
 
         // Assert
         result.Should().NotBeNull();

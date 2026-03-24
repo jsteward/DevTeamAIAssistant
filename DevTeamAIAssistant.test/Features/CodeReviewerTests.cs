@@ -57,9 +57,7 @@ public class CodeReviewerTests
             .ReturnsAsync(expectedResult);
 
         // Act
-        var response = await _reviewer.AnalyzeAsync(request);
-
-        var result = response as CodeReviewAnalyzerResponse;
+        var result = await _reviewer.AnalyzeAsync(request);
         // Assert
         result.Should().NotBeNull();
         result.Review.QualityScore.Should().Be(8);

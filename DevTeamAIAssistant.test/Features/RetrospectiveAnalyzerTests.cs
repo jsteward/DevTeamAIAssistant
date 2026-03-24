@@ -53,8 +53,7 @@ public class RetrospectiveAnalyzerTests
             .ReturnsAsync(expectedReport);
 
         // Act
-        var response = await _analyzer.AnalyzeAsync(new RetrospectiveAnalyzerRequest  { Data = retrospectiveNotes });
-        var result = response as RetrospectiveAnalyzerResponse;
+        var result = await _analyzer.AnalyzeAsync(new RetrospectiveAnalyzerRequest { Data = retrospectiveNotes });
 
         // Assert
         result.Should().NotBeNull();
