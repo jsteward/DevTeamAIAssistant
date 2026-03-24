@@ -1,6 +1,7 @@
 using Moq;
 using FluentAssertions;
 using DevTeamAIAssistant.Features;
+using DevTeamAIAssistant.Features.IO;
 using DevTeamAIAssistant.Features.Presenters;
 using DevTeamAIAssistant.Requests;
 using DevTeamAIAssistant.Response;
@@ -12,6 +13,7 @@ public class CodeReviewRunnerTests
 {
     private Mock<IAnalyzer<CodeReviewAnalyzerRequest, CodeReviewAnalyzerResponse>> _mockAnalyzer;
     private Mock<IAnalyzerPresenter<CodeReviewAnalyzerResponse>> _mockPresenter;
+    private Mock<IConsoleWriter> _mockWriter;
     private CodeReviewRunner _runner;
 
     [SetUp]
@@ -19,7 +21,8 @@ public class CodeReviewRunnerTests
     {
         _mockAnalyzer = new Mock<IAnalyzer<CodeReviewAnalyzerRequest, CodeReviewAnalyzerResponse>>();
         _mockPresenter = new Mock<IAnalyzerPresenter<CodeReviewAnalyzerResponse>>();
-        _runner = new CodeReviewRunner(_mockAnalyzer.Object, _mockPresenter.Object);
+        _mockWriter = new Mock<IConsoleWriter>();
+        _runner = new CodeReviewRunner(_mockAnalyzer.Object, _mockPresenter.Object, _mockWriter.Object, new ConsoleReader());
 
         _mockAnalyzer
             .Setup(x => x.AnalyzeAsync(It.IsAny<CodeReviewAnalyzerRequest>()))

@@ -5,8 +5,11 @@ using DevTeamAIAssistant.Response;
 using DevTeamAIAssistant.Services;
 namespace DevTeamAIAssistant.Features;
 
-public partial class CodeReviewAnalyzer : IAnalyzer<CodeReviewAnalyzerRequest, CodeReviewAnalyzerResponse>
+public class CodeReviewAnalyzer : AnalyzerBase, IAnalyzer<CodeReviewAnalyzerRequest, CodeReviewAnalyzerResponse>
 {
+    private const int CodeInputLimit = 5000;
+    protected override int MaxInputLength => CodeInputLimit;
+
     private readonly IClaudeService _claudeService;
 
     public CodeReviewAnalyzer(IClaudeService claudeService)
@@ -54,9 +57,8 @@ public partial class CodeReviewAnalyzer : IAnalyzer<CodeReviewAnalyzerRequest, C
             response.Review = result;
             return response;
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is not OperationCanceledException)
         {
-            Console.WriteLine($"Error during code review: {ex.Message}");
             response.Review = new CodeReviewResult()
             {
                 OverallAssessment = "Error during analysis",
@@ -68,34 +70,6 @@ public partial class CodeReviewAnalyzer : IAnalyzer<CodeReviewAnalyzerRequest, C
             return response;
         }
     }
-
-    private static string SanitizeInput(string input)
-    {
-        // Remove control characters
-        var sanitized = new string(input.Where(c => !char.IsControl(c)).ToArray());
-
-        // Neutralize common prompt injection patterns by escaping them
-        sanitized = InjectionPattern().Replace(sanitized, m => $"[REMOVED:{m.Value.Trim()}]");
-
-        // Enforce length limit
-        return sanitized.Length > 500 ? sanitized[..500] : sanitized;
-    }
-
-    // Matches phrases commonly used to hijack LLM instructions
-    [System.Text.RegularExpressions.GeneratedRegex(
-        @"\b(ignore\s+(all\s+)?(previous|prior|above|earlier)\s+instructions?|" +
-        @"disregard\s+(all\s+)?(previous|prior|above|earlier)\s+instructions?|" +
-        @"forget\s+(all\s+)?(previous|prior|above|earlier)\s+instructions?|" +
-        @"new\s+instructions?:|" +
-        @"system\s*prompt|" +
-        @"you\s+are\s+now|" +
-        @"act\s+as\s+(?!a\s+senior)|" +  // allow "act as a senior [architect]" from the real prompt
-        @"pretend\s+(you\s+are|to\s+be)|" +
-        @"override\s+(previous\s+)?instructions?|" +
-        @"</?(context|system|prompt|instruction)>)",
-        System.Text.RegularExpressions.RegexOptions.IgnoreCase,
-        matchTimeoutMilliseconds: 1000)]
-    private static partial System.Text.RegularExpressions.Regex InjectionPattern();
 
     private StringBuilder PromptBuilder(string code, string? context)
     {

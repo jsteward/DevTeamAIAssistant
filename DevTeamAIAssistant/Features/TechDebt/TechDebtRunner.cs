@@ -1,49 +1,30 @@
+using DevTeamAIAssistant.Features.IO;
 using DevTeamAIAssistant.Features.Presenters;
 using DevTeamAIAssistant.Requests;
 using DevTeamAIAssistant.Response;
 
 namespace DevTeamAIAssistant.Features;
 
-public class TechDebtRunner : IAnalyzerRunner
+public class TechDebtRunner : AnalyzerRunnerBase<TechDebtPriorityAnalyzerRequest, TechDebtPriorityAnalyzerResponse>
 {
-    private readonly IAnalyzer<TechDebtPriorityAnalyzerRequest, TechDebtPriorityAnalyzerResponse> _analyzer;
-    private readonly IAnalyzerPresenter<TechDebtPriorityAnalyzerResponse> _presenter;
+    public override string MenuKey => "3";
+    public override string MenuLabel => "Prioritize Technical Debt";
+    protected override string Title => "Technical Debt Prioritizer";
+    protected override string InputPrompt => "Enter technical debt items (one per line, type 'END' when done):";
+    protected override bool SkipEmptyLines => true;
+    protected override string NoInputMessage => "No items entered.";
+    protected override string GetProcessingMessage(int lineCount) => $"Analyzing {lineCount} technical debt items...";
 
-    public TechDebtRunner(IAnalyzer<TechDebtPriorityAnalyzerRequest, TechDebtPriorityAnalyzerResponse> analyzer, IAnalyzerPresenter<TechDebtPriorityAnalyzerResponse> presenter)
-    {
-        _analyzer = analyzer;
-        _presenter = presenter;
-    }
+    public TechDebtRunner(
+        IAnalyzer<TechDebtPriorityAnalyzerRequest, TechDebtPriorityAnalyzerResponse> analyzer,
+        IAnalyzerPresenter<TechDebtPriorityAnalyzerResponse> presenter,
+        IConsoleWriter writer,
+        IConsoleReader reader)
+        : base(analyzer, presenter, writer, reader) { }
 
-    public string MenuKey => "3";
-    public string MenuLabel => "Prioritize Technical Debt";
-
-    public async Task RunAsync()
-    {
-        Console.WriteLine("\n--- Technical Debt Prioritizer ---");
-        Console.WriteLine("Enter technical debt items (one per line, type 'END' when done):\n");
-
-        var items = ConsoleInput.ReadLines(skipEmpty: true);
-
-        if (!items.Any())
+    protected override TechDebtPriorityAnalyzerRequest BuildRequest(List<string> lines) =>
+        new()
         {
-            Console.WriteLine("No items entered.");
-            return;
-        }
-
-        Console.WriteLine($"\nAnalyzing {items.Count} technical debt items...\n");
-        try
-        {
-            var request = new TechDebtPriorityAnalyzerRequest
-            {
-                Data = string.Join("\n", items.Select((item, i) => $"{i + 1}. {item}"))
-            };
-            var response = await _analyzer.AnalyzeAsync(request);
-            _presenter.Display(response);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error: {ex.Message}");
-        }
-    }
+            Data = string.Join("\n", lines.Select((item, i) => $"{i + 1}. {item}"))
+        };
 }

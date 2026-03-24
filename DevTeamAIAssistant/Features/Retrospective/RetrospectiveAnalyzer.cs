@@ -4,8 +4,11 @@ using DevTeamAIAssistant.Response;
 using DevTeamAIAssistant.Services;
 namespace DevTeamAIAssistant.Features;
 
-public class RetrospectiveAnalyzer : IAnalyzer<RetrospectiveAnalyzerRequest, RetrospectiveAnalyzerResponse>
+public class RetrospectiveAnalyzer : AnalyzerBase, IAnalyzer<RetrospectiveAnalyzerRequest, RetrospectiveAnalyzerResponse>
 {
+    private const int NotesInputLimit = 3000;
+    protected override int MaxInputLength => NotesInputLimit;
+
     private readonly IClaudeService _claudeService;
 
     public RetrospectiveAnalyzer(IClaudeService claudeService)
@@ -16,6 +19,7 @@ public class RetrospectiveAnalyzer : IAnalyzer<RetrospectiveAnalyzerRequest, Ret
     public async Task<RetrospectiveAnalyzerResponse> AnalyzeAsync(RetrospectiveAnalyzerRequest request)
     {
         var response = new RetrospectiveAnalyzerResponse();
+        var data = SanitizeInput(request.Data);
         var prompt = @"You are an expert Agile coach analyzing a sprint retrospective.
 
         Analyze the following retrospective notes and provide a structured report in JSON format:
@@ -38,11 +42,21 @@ public class RetrospectiveAnalyzer : IAnalyzer<RetrospectiveAnalyzerRequest, Ret
 
         Focus on actionable insights and realistic recommendations.";
 
-        var result = await _claudeService.AnalyzeStructuredAsync<RetrospectiveReport>(
-            prompt, 
-            request.Data
-        );
-        response.Report = result;
+        try
+        {
+            response.Report = await _claudeService.AnalyzeStructuredAsync<RetrospectiveReport>(
+                prompt,
+                data
+            );
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            response.Report = new RetrospectiveReport
+            {
+                OverallSentiment = "Error during analysis",
+                ManagerRecommendation = "Analysis failed. Please try again."
+            };
+        }
         return response;
     }
 

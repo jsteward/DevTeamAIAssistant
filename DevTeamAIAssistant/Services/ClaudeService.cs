@@ -10,6 +10,8 @@ public partial class ClaudeService : IClaudeService
     private readonly string _apiKey;
     private readonly string _model;
     private const string AnthropicApiUrl = "https://api.anthropic.com/v1/messages";
+    private const string DefaultModel = "claude-sonnet-4-20250514";
+    private const int MaxResponseTokens = 4096;
 
     public ClaudeService(IConfiguration configuration, IHttpClientFactory httpClientFactory)
     {
@@ -19,7 +21,7 @@ public partial class ClaudeService : IClaudeService
             throw new InvalidOperationException("Anthropic API key not configured");
         }
         _apiKey = key;
-        _model = configuration["Anthropic:Model"] ?? "claude-sonnet-4-20250514";
+        _model = configuration["Anthropic:Model"] ?? DefaultModel;
 
         _httpClient = httpClientFactory.CreateClient("Anthropic");
         _httpClient.DefaultRequestHeaders.Add("x-api-key", _apiKey);
@@ -30,7 +32,7 @@ public partial class ClaudeService : IClaudeService
         var requestBody = new
         {
             model = _model,
-            max_tokens = 4096,
+            max_tokens = MaxResponseTokens,
             messages = new[]
             {
                 new

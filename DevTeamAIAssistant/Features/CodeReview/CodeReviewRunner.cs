@@ -1,43 +1,29 @@
+using DevTeamAIAssistant.Features.IO;
 using DevTeamAIAssistant.Features.Presenters;
 using DevTeamAIAssistant.Requests;
 using DevTeamAIAssistant.Response;
 
 namespace DevTeamAIAssistant.Features;
 
-public class CodeReviewRunner : IAnalyzerRunner
+public class CodeReviewRunner : AnalyzerRunnerBase<CodeReviewAnalyzerRequest, CodeReviewAnalyzerResponse>
 {
-    private readonly IAnalyzer<CodeReviewAnalyzerRequest, CodeReviewAnalyzerResponse> _analyzer;
-    private readonly IAnalyzerPresenter<CodeReviewAnalyzerResponse> _presenter;
+    public override string MenuKey => "2";
+    public override string MenuLabel => "Review Code";
+    protected override string Title => "Code Review Assistant";
+    protected override string InputPrompt => "Enter code to review (type 'END' on a new line when done):";
+    protected override string GetProcessingMessage(int lineCount) => "Reviewing code...";
 
-    public CodeReviewRunner(IAnalyzer<CodeReviewAnalyzerRequest, CodeReviewAnalyzerResponse> analyzer, IAnalyzerPresenter<CodeReviewAnalyzerResponse> presenter)
-    {
-        _analyzer = analyzer;
-        _presenter = presenter;
-    }
+    public CodeReviewRunner(
+        IAnalyzer<CodeReviewAnalyzerRequest, CodeReviewAnalyzerResponse> analyzer,
+        IAnalyzerPresenter<CodeReviewAnalyzerResponse> presenter,
+        IConsoleWriter writer,
+        IConsoleReader reader)
+        : base(analyzer, presenter, writer, reader) { }
 
-    public string MenuKey => "2";
-    public string MenuLabel => "Review Code";
-
-    public async Task RunAsync()
-    {
-        Console.WriteLine("\n--- Code Review Assistant ---");
-        Console.WriteLine("Enter code to review (type 'END' on a new line when done):\n");
-
-        var request = new CodeReviewAnalyzerRequest
+    protected override CodeReviewAnalyzerRequest BuildRequest(List<string> lines) =>
+        new()
         {
-            Data = string.Join("\n", ConsoleInput.ReadLines()),
+            Data = string.Join("\n", lines),
             Context = "This code is part of a web API project using ASP.NET Core."
         };
-
-        Console.WriteLine("\nReviewing code...\n");
-        try
-        {
-            var response = await _analyzer.AnalyzeAsync(request);
-            _presenter.Display(response);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error: {ex.Message}");
-        }
-    }
 }

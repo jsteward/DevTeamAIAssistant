@@ -4,8 +4,11 @@ using DevTeamAIAssistant.Response;
 using DevTeamAIAssistant.Services;
 namespace DevTeamAIAssistant.Features;
 
-public class TechDebtPriorityAnalyzer : IAnalyzer<TechDebtPriorityAnalyzerRequest, TechDebtPriorityAnalyzerResponse>
+public class TechDebtPriorityAnalyzer : AnalyzerBase, IAnalyzer<TechDebtPriorityAnalyzerRequest, TechDebtPriorityAnalyzerResponse>
 {
+    private const int ItemsInputLimit = 3000;
+    protected override int MaxInputLength => ItemsInputLimit;
+
     private readonly IClaudeService _claudeService;
 
     public TechDebtPriorityAnalyzer(IClaudeService claudeService)
@@ -14,8 +17,8 @@ public class TechDebtPriorityAnalyzer : IAnalyzer<TechDebtPriorityAnalyzerReques
     }
 
     public async Task<TechDebtPriorityAnalyzerResponse> AnalyzeAsync(TechDebtPriorityAnalyzerRequest request)
-    {      
-        
+    {
+        var data = SanitizeInput(request.Data);
         var prompt = @"You are a technical architect helping prioritize technical debt.
 
         Analyze these technical debt items and prioritize them based on:
@@ -46,10 +49,21 @@ public class TechDebtPriorityAnalyzer : IAnalyzer<TechDebtPriorityAnalyzerReques
 
         Sort by priority (highest first). Be realistic about effort estimates.";
         var response = new TechDebtPriorityAnalyzerResponse();
-        response.Report = await _claudeService.AnalyzeStructuredAsync<TechDebtAnalysis>(
-            prompt, request.Data
-            
-        );
+        try
+        {
+            response.Report = await _claudeService.AnalyzeStructuredAsync<TechDebtAnalysis>(
+                prompt,
+                data
+            );
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            response.Report = new TechDebtAnalysis
+            {
+                OverallRecommendation = "Error during analysis",
+                RiskAssessment = "Analysis failed. Please try again."
+            };
+        }
         return response;
     }
 

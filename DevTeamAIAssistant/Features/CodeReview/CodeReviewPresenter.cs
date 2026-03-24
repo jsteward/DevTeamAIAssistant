@@ -1,49 +1,59 @@
+using DevTeamAIAssistant.Features.IO;
+using DevTeamAIAssistant.Features.Presenters;
 using DevTeamAIAssistant.Models;
 using DevTeamAIAssistant.Response;
 
-namespace DevTeamAIAssistant.Features.Presenters;
+namespace DevTeamAIAssistant.Features.CodeReview;
 
 public class CodeReviewPresenter : IAnalyzerPresenter<CodeReviewAnalyzerResponse>
 {
+    private const int SeparatorWidth = 60;
+    private readonly IConsoleWriter _writer;
+
+    public CodeReviewPresenter(IConsoleWriter writer)
+    {
+        _writer = writer;
+    }
+
     public void Display(CodeReviewAnalyzerResponse response)
     {
         var review = response.Review;
 
-        Console.WriteLine("\n" + new string('=', 60));
-        Console.WriteLine("CODE REVIEW ANALYSIS");
-        Console.WriteLine(new string('=', 60));
+        _writer.WriteLine("\n" + new string('=', SeparatorWidth));
+        _writer.WriteLine("CODE REVIEW ANALYSIS");
+        _writer.WriteLine(new string('=', SeparatorWidth));
 
-        Console.WriteLine($"\nQuality Score: {review.QualityScore}/10");
-        Console.WriteLine($"\nOverall Assessment:\n  {review.OverallAssessment}");
+        _writer.WriteLine($"\nQuality Score: {review.QualityScore}/10");
+        _writer.WriteLine($"\nOverall Assessment:\n  {review.OverallAssessment}");
 
         if (review.SecurityConcerns.Any())
         {
-            Console.WriteLine("\nSecurity Concerns:");
+            _writer.WriteLine("\nSecurity Concerns:");
             foreach (var concern in review.SecurityConcerns)
-                Console.WriteLine($"  {concern}");
+                _writer.WriteLine($"  {concern}");
         }
 
         if (review.BestPractices.Any())
         {
-            Console.WriteLine("\nBest Practices Observed:");
+            _writer.WriteLine("\nBest Practices Observed:");
             foreach (var practice in review.BestPractices)
-                Console.WriteLine($"  • {practice}");
+                _writer.WriteLine($"  • {practice}");
         }
 
-        Console.WriteLine("\nReview Comments:");
+        _writer.WriteLine("\nReview Comments:");
         foreach (var group in review.Comments.GroupBy(c => c.Severity).OrderBy(g => SeverityLevelExtensions.Parse(g.Key)))
         {
-            Console.WriteLine($"\n  [{group.Key.ToUpper()}]");
+            _writer.WriteLine($"\n  [{group.Key.ToUpper()}]");
             foreach (var comment in group)
             {
-                Console.WriteLine($"    {comment.Category}: {comment.Issue}");
-                Console.WriteLine($"    {comment.Suggestion}");
+                _writer.WriteLine($"    {comment.Category}: {comment.Issue}");
+                _writer.WriteLine($"    {comment.Suggestion}");
                 if (comment.LineNumber > 0)
-                    Console.WriteLine($"    Line {comment.LineNumber}");
-                Console.WriteLine();
+                    _writer.WriteLine($"    Line {comment.LineNumber}");
+                _writer.WriteLine();
             }
         }
 
-        Console.WriteLine(new string('=', 60) + "\n");
+        _writer.WriteLine(new string('=', SeparatorWidth) + "\n");
     }
 }

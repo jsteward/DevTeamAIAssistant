@@ -1,8 +1,10 @@
-namespace DevTeamAIAssistant.Features;
+namespace DevTeamAIAssistant.Features.IO;
 
-public static class ConsoleInput
+public class ConsoleReader : IConsoleReader
 {
-    public static List<string> ReadLines(bool skipEmpty = false)
+    public string? ReadLine() => Console.ReadLine();
+
+    public List<string> ReadLines(bool skipEmpty = false)
     {
         var lines = new List<string>();
         string? line;

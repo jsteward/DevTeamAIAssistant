@@ -1,5 +1,9 @@
 ﻿using DevTeamAIAssistant.Features;
+using DevTeamAIAssistant.Features.CodeReview;
+using DevTeamAIAssistant.Features.IO;
 using DevTeamAIAssistant.Features.Presenters;
+using DevTeamAIAssistant.Features.Retrospective;
+using DevTeamAIAssistant.Features.TechDebt;
 using DevTeamAIAssistant.Requests;
 using DevTeamAIAssistant.Response;
 using DevTeamAIAssistant.Services;
@@ -25,6 +29,8 @@ class Program
             client.DefaultRequestHeaders.Accept.Add(
                 new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
         });
+        services.AddSingleton<IConsoleWriter, ConsoleWriter>();
+        services.AddSingleton<IConsoleReader, ConsoleReader>();
         services.AddSingleton<IClaudeService, ClaudeService>();
         services.AddTransient<IAnalyzer<RetrospectiveAnalyzerRequest, RetrospectiveAnalyzerResponse>, RetrospectiveAnalyzer>();
         services.AddTransient<IAnalyzer<CodeReviewAnalyzerRequest, CodeReviewAnalyzerResponse>, CodeReviewAnalyzer>();

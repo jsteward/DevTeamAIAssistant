@@ -1,43 +1,29 @@
+using DevTeamAIAssistant.Features.IO;
 using DevTeamAIAssistant.Features.Presenters;
 using DevTeamAIAssistant.Requests;
 using DevTeamAIAssistant.Response;
 
 namespace DevTeamAIAssistant.Features;
 
-public class RetrospectiveRunner : IAnalyzerRunner
+public class RetrospectiveRunner : AnalyzerRunnerBase<RetrospectiveAnalyzerRequest, RetrospectiveAnalyzerResponse>
 {
-    private readonly IAnalyzer<RetrospectiveAnalyzerRequest, RetrospectiveAnalyzerResponse> _analyzer;
-    private readonly IAnalyzerPresenter<RetrospectiveAnalyzerResponse> _presenter;
+    public override string MenuKey => "1";
+    public override string MenuLabel => "Analyze Sprint Retrospective";
+    protected override string Title => "Sprint Retrospective Analyzer";
+    protected override string InputPrompt => "Enter retrospective notes (type 'END' on a new line when done):";
+    protected override string GetProcessingMessage(int lineCount) => "Analyzing retrospective...";
 
-    public RetrospectiveRunner(IAnalyzer<RetrospectiveAnalyzerRequest, RetrospectiveAnalyzerResponse> analyzer, IAnalyzerPresenter<RetrospectiveAnalyzerResponse> presenter)
-    {
-        _analyzer = analyzer;
-        _presenter = presenter;
-    }
+    public RetrospectiveRunner(
+        IAnalyzer<RetrospectiveAnalyzerRequest, RetrospectiveAnalyzerResponse> analyzer,
+        IAnalyzerPresenter<RetrospectiveAnalyzerResponse> presenter,
+        IConsoleWriter writer,
+        IConsoleReader reader)
+        : base(analyzer, presenter, writer, reader) { }
 
-    public string MenuKey => "1";
-    public string MenuLabel => "Analyze Sprint Retrospective";
-
-    public async Task RunAsync()
-    {
-        Console.WriteLine("\n--- Sprint Retrospective Analyzer ---");
-        Console.WriteLine("Enter retrospective notes (type 'END' on a new line when done):\n");
-
-        var request = new RetrospectiveAnalyzerRequest
+    protected override RetrospectiveAnalyzerRequest BuildRequest(List<string> lines) =>
+        new()
         {
-            Data = string.Join("\n", ConsoleInput.ReadLines()),
+            Data = string.Join("\n", lines),
             Context = "This retrospective is for a 2-week sprint in a mid-sized software development team."
         };
-
-        Console.WriteLine("\nAnalyzing retrospective...\n");
-        try
-        {
-            var response = await _analyzer.AnalyzeAsync(request);
-            _presenter.Display(response);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error: {ex.Message}");
-        }
-    }
 }

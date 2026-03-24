@@ -1,41 +1,51 @@
+using DevTeamAIAssistant.Features.IO;
+using DevTeamAIAssistant.Features.Presenters;
 using DevTeamAIAssistant.Response;
 
-namespace DevTeamAIAssistant.Features.Presenters;
+namespace DevTeamAIAssistant.Features.Retrospective;
 
 public class RetrospectivePresenter : IAnalyzerPresenter<RetrospectiveAnalyzerResponse>
 {
+    private const int SeparatorWidth = 60;
+    private readonly IConsoleWriter _writer;
+
+    public RetrospectivePresenter(IConsoleWriter writer)
+    {
+        _writer = writer;
+    }
+
     public void Display(RetrospectiveAnalyzerResponse response)
     {
         var report = response.Report;
 
-        Console.WriteLine("\n" + new string('=', 60));
-        Console.WriteLine("SPRINT RETROSPECTIVE ANALYSIS");
-        Console.WriteLine(new string('=', 60));
+        _writer.WriteLine("\n" + new string('=', SeparatorWidth));
+        _writer.WriteLine("SPRINT RETROSPECTIVE ANALYSIS");
+        _writer.WriteLine(new string('=', SeparatorWidth));
 
-        Console.WriteLine($"\nOverall Sentiment: {report.OverallSentiment.ToUpper()}");
+        _writer.WriteLine($"\nOverall Sentiment: {report.OverallSentiment.ToUpper()}");
 
-        Console.WriteLine("\nKey Themes:");
+        _writer.WriteLine("\nKey Themes:");
         foreach (var theme in report.KeyThemes)
-            Console.WriteLine($"  • {theme}");
+            _writer.WriteLine($"  • {theme}");
 
-        Console.WriteLine("\nWins:");
+        _writer.WriteLine("\nWins:");
         foreach (var win in report.Wins)
-            Console.WriteLine($"  • {win}");
+            _writer.WriteLine($"  • {win}");
 
-        Console.WriteLine("\nConcerns:");
+        _writer.WriteLine("\nConcerns:");
         foreach (var concern in report.Concerns)
-            Console.WriteLine($"  • {concern}");
+            _writer.WriteLine($"  • {concern}");
 
-        Console.WriteLine("\nAction Items:");
+        _writer.WriteLine("\nAction Items:");
         foreach (var item in report.ActionItems)
         {
-            Console.WriteLine($"  [{item.Priority.ToUpper()}] {item.Description}");
-            Console.WriteLine($"      Owner: {item.Owner} | Effort: {item.EstimatedEffortDays} days");
+            _writer.WriteLine($"  [{item.Priority.ToUpper()}] {item.Description}");
+            _writer.WriteLine($"      Owner: {item.Owner} | Effort: {item.EstimatedEffortDays} days");
         }
 
-        Console.WriteLine("\nManager Recommendation:");
-        Console.WriteLine($"  {report.ManagerRecommendation}");
+        _writer.WriteLine("\nManager Recommendation:");
+        _writer.WriteLine($"  {report.ManagerRecommendation}");
 
-        Console.WriteLine("\n" + new string('=', 60) + "\n");
+        _writer.WriteLine("\n" + new string('=', SeparatorWidth) + "\n");
     }
 }

@@ -1,6 +1,7 @@
 using Moq;
 using FluentAssertions;
 using DevTeamAIAssistant.Features;
+using DevTeamAIAssistant.Features.IO;
 using DevTeamAIAssistant.Features.Presenters;
 using DevTeamAIAssistant.Requests;
 using DevTeamAIAssistant.Response;
@@ -12,6 +13,7 @@ public class TechDebtRunnerTests
 {
     private Mock<IAnalyzer<TechDebtPriorityAnalyzerRequest, TechDebtPriorityAnalyzerResponse>> _mockAnalyzer;
     private Mock<IAnalyzerPresenter<TechDebtPriorityAnalyzerResponse>> _mockPresenter;
+    private Mock<IConsoleWriter> _mockWriter;
     private TechDebtRunner _runner;
 
     [SetUp]
@@ -19,7 +21,8 @@ public class TechDebtRunnerTests
     {
         _mockAnalyzer = new Mock<IAnalyzer<TechDebtPriorityAnalyzerRequest, TechDebtPriorityAnalyzerResponse>>();
         _mockPresenter = new Mock<IAnalyzerPresenter<TechDebtPriorityAnalyzerResponse>>();
-        _runner = new TechDebtRunner(_mockAnalyzer.Object, _mockPresenter.Object);
+        _mockWriter = new Mock<IConsoleWriter>();
+        _runner = new TechDebtRunner(_mockAnalyzer.Object, _mockPresenter.Object, _mockWriter.Object, new ConsoleReader());
 
         _mockAnalyzer
             .Setup(x => x.AnalyzeAsync(It.IsAny<TechDebtPriorityAnalyzerRequest>()))
