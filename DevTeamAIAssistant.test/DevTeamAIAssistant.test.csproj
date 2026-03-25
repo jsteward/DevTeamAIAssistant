@@ -29,7 +29,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../DevTeamAIAssistant.csproj" />
     <ProjectReference Include="../DevTeamAIAssistant/DevTeamAIAssistant.csproj" />
   </ItemGroup>
 
