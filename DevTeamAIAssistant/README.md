@@ -15,7 +15,7 @@
 
 DevTeam AI Assistant helps development managers make data-driven decisions by leveraging Large Language Models (LLMs) for analysis, review, and prioritization tasks.
 
-**Built by:** Jacques Steward - Software Development Manager  
+**Built by:** Jacques Steward - Principle Consultant
 **Tech Stack:** C# • .NET 8 • Anthropic Claude API • System.Text.Json  
 **Purpose:** Demonstrates practical LLM integration in enterprise .NET applications
 
@@ -38,14 +38,15 @@ dotnet test /p:CollectCoverage=true
 
 ### Test Framework
 
-- **NUnit 3.14**: Modern .NET testing framework
+- **NUnit 4.3**: Modern .NET testing framework
 - **Moq 4.20**: Mocking library for dependency injection
 - **FluentAssertions**: Readable assertion library
 
 ### Test Coverage
 
 - Services: Configuration and initialization
-- Features: All analyzer classes
+- Features: All analyzer and runner classes
+- Presenters: Output formatting and conditional rendering
 - Models: Data structure validation
 ## ✨ Features
 
@@ -342,25 +343,47 @@ This project demonstrates proficiency in:
 ## 📁 Project Structure
 ```
 DevTeamAIAssistant/
-├── Program.cs                    # Application entry point
+├── Program.cs                          # Application entry point
 ├── Services/
-│   ├── IClaudeService.cs        # Service interface
-│   └── ClaudeService.cs         # Claude API integration
+│   ├── IClaudeService.cs               # Service interface
+│   └── ClaudeService.cs                # Claude API integration
 ├── Features/
-│   ├── RetrospectiveAnalyzer.cs # Sprint retro analysis
-│   ├── CodeReviewer.cs          # Code review automation
-│   └── TechDebtPrioritizer.cs   # Debt prioritization
-├── Models/
-│   ├── RetrospectiveReport.cs   # Retro analysis models
-│   ├── CodeReviewResult.cs      # Code review models
-│   └── TechDebtItem.cs          # Tech debt models
-├── Examples/
-│   ├── retrospective-sample.txt
-│   ├── tech-debt-sample.txt
-│   ├── code-review-sql-injection.txt
-│   └── code-review-*.txt
-├── appsettings.json             # Config (gitignored)
-├── appsettings.example.json     # Config template
+│   ├── IAnalyzer.cs                    # Generic analyzer interface
+│   ├── IAnalyzerRunner.cs              # Runner interface
+│   ├── IAnalyzerFactory.cs             # Factory interface
+│   ├── AnalyzerBase.cs                 # Shared analyzer logic & input sanitization
+│   ├── AnalyzerRunnerBase.cs           # Shared runner orchestration
+│   ├── AnalyzerFactory.cs              # Feature registration & lookup
+│   ├── IO/
+│   │   ├── IConsoleWriter.cs
+│   │   ├── IConsoleReader.cs
+│   │   ├── ConsoleWriter.cs
+│   │   └── ConsoleReader.cs
+│   ├── Presenters/
+│   │   └── IAnalyzerPresenter.cs       # Generic presenter interface
+│   ├── Retrospective/
+│   │   ├── RetrospectiveAnalyzer.cs
+│   │   ├── RetrospectiveRunner.cs
+│   │   └── RetrospectivePresenter.cs
+│   ├── CodeReview/
+│   │   ├── CodeReviewAnalyzer.cs
+│   │   ├── CodeReviewRunner.cs
+│   │   └── CodeReviewPresenter.cs
+│   └── TechDebt/
+│       ├── TechDebtPriorityAnalyzer.cs
+│       ├── TechDebtRunner.cs
+│       └── TechDebtPresenter.cs
+├── Models/                             # Domain models
+├── Requests/                           # Request contracts
+├── Response/                           # Response contracts
+├── DevTeamAIAssistant.test/
+│   ├── Features/
+│   │   ├── Presenters/                 # Presenter output tests
+│   │   └── ...                        # Analyzer & runner tests
+│   ├── Models/
+│   └── Services/
+├── appsettings.json                    # Config (gitignored)
+├── appsettings.example.json            # Config template
 ├── .gitignore
 ├── LICENSE
 └── README.md
@@ -378,7 +401,7 @@ DevTeamAIAssistant/
 - [ ] **Slack/Teams Bot** - Chat interface for quick analysis
 - [ ] **Multi-Model Support** - Add GPT-4, Gemini options
 - [ ] **Docker Container** - Containerized deployment
-- [ ] **Unit Tests** - Comprehensive test coverage
+- [x] **Unit Tests** - 73 tests covering analyzers, runners, presenters, models, and services
 - [ ] **GitHub Actions CI/CD** - Automated build and test pipeline
 
 ---
@@ -433,7 +456,8 @@ Software Development Manager | 10+ Years .NET/C# | AI-Augmented Development Advo
 
 - **Language:** C#
 - **Framework:** .NET 8.0
-- **Lines of Code:** ~800
+- **Lines of Code:** ~1,100
+- **Test Count:** 73 unit tests
 - **Dependencies:** 2 NuGet packages
 - **Build Time:** 1-2 weeks
 - **API Cost:** ~$0.50 for testing
