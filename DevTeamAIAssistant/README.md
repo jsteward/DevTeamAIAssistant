@@ -15,7 +15,7 @@
 
 DevTeam AI Assistant helps development managers make data-driven decisions by leveraging Large Language Models (LLMs) for analysis, review, and prioritization tasks.
 
-**Built by:** Jacques Steward - Principle Consultant
+**Built by:** Jacques Steward - Principle Consultant 
 **Tech Stack:** C# • .NET 8 • Anthropic Claude API • System.Text.Json  
 **Purpose:** Demonstrates practical LLM integration in enterprise .NET applications
 
